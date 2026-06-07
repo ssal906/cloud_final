@@ -140,8 +140,8 @@ export default function Schedule() {
     try {
       await scheduleAPI.create({
         ...form,
-        start_datetime: new Date(form.start_datetime).toISOString(),
-        end_datetime: new Date(form.end_datetime).toISOString(),
+        start_datetime: form.start_datetime,
+        end_datetime: form.end_datetime,
       })
       setShowAdd(false)
       setForm(emptyForm)
@@ -154,8 +154,8 @@ export default function Schedule() {
     try {
       await scheduleAPI.update(selectedEvent.id, {
         ...form,
-        start_datetime: new Date(form.start_datetime).toISOString(),
-        end_datetime: new Date(form.end_datetime).toISOString(),
+        start_datetime: form.start_datetime,
+        end_datetime: form.end_datetime,
       })
       setShowEdit(false)
       fetchEvents()
