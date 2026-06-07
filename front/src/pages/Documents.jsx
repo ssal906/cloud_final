@@ -13,6 +13,24 @@ const parseUTC = (dateStr) => {
   return new Date(dateStr.endsWith('Z') ? dateStr : dateStr + 'Z')
 }
 
+const downloadFile = async (doc) => {
+  const token = localStorage.getItem('token')
+  const res = await fetch(documentAPI.downloadUrl(doc.id), {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) throw new Error('파일을 다운로드할 수 없습니다.')
+
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = doc.file_name || doc.title || 'download'
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
 function FileViewer({ doc, onClose }) {
   const [blobUrl, setBlobUrl] = useState(null)
   const [htmlContent, setHtmlContent] = useState(null)
@@ -69,10 +87,10 @@ function FileViewer({ doc, onClose }) {
         <div className="flex items-center justify-between px-5 py-3 border-b flex-shrink-0">
           <h2 className="font-semibold text-gray-900 truncate">{doc.title}</h2>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <a href={documentAPI.downloadUrl(doc.id)}
-              className="flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 px-3 py-1.5 border rounded-lg" download>
+            <button onClick={() => downloadFile(doc)}
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 px-3 py-1.5 border rounded-lg">
               <Download size={13} /> 다운로드
-            </a>
+            </button>
             <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400">
               <X size={18} />
             </button>
@@ -117,10 +135,10 @@ function FileViewer({ doc, onClose }) {
               <p className="text-xs text-gray-400 mb-5">
                 지원 형식: PDF, 이미지, TXT, DOCX, XLSX, PPTX
               </p>
-              <a href={documentAPI.downloadUrl(doc.id)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700" download>
+              <button onClick={() => downloadFile(doc)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">
                 <Download size={14} /> 파일 다운로드
-              </a>
+              </button>
             </div>
           )}
 
@@ -132,10 +150,10 @@ function FileViewer({ doc, onClose }) {
               </div>
               <p className="font-semibold text-gray-700 mb-1">미리보기를 불러올 수 없습니다</p>
               <p className="text-xs text-red-400 mb-5">{error}</p>
-              <a href={documentAPI.downloadUrl(doc.id)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700" download>
+              <button onClick={() => downloadFile(doc)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">
                 <Download size={14} /> 파일 다운로드
-              </a>
+              </button>
             </div>
           )}
         </div>
@@ -270,10 +288,10 @@ export default function Documents() {
                         className="flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 px-2 py-1 border border-gray-200 rounded-lg">
                         <Eye size={12} /> 보기
                       </button>
-                      <a href={documentAPI.downloadUrl(doc.id)}
-                        className="flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 px-2 py-1 border border-gray-200 rounded-lg" download>
+                      <button onClick={() => downloadFile(doc)}
+                        className="flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 px-2 py-1 border border-gray-200 rounded-lg">
                         <Download size={12} /> 다운로드
-                      </a>
+                      </button>
                     </>
                   )}
                 </div>
